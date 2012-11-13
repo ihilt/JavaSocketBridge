@@ -3,3 +3,4 @@ javac -classpath "c:\program files\java\jdk1.6.0_31\jre\lib\plugin.jar" "JavaSoc
 jar cvf JavaSocketBridge.jar "JavaSocketBridge.class" "Listener.class"
 jarsigner JavaSocketBridge.jar myNewKey
 mv JavaSocketBridge.jar ..
+rm *.class

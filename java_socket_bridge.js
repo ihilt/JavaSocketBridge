@@ -1,4 +1,4 @@
-/*global document: false */
+/*global document: false, console: false */
 // Global variables
 var java_socket_bridge_ready_flag = false,
 	is_connected_flag;
@@ -9,7 +9,7 @@ function get_java_socket_bridge() {
 	return document.getElementById('JavaSocketBridge');
 }
 
-function is_connected (b) {
+function is_connected() {
 	"use strict";
 	return is_connected_flag;
 }
@@ -63,9 +63,8 @@ function socket_send(message) {
 	"use strict";
 	if (java_socket_bridge_ready_flag) {
 		return get_java_socket_bridge().send(message);
-	} else {
-		on_socket_error("Java Socket Bridge cannot send a message until the applet has loaded");
 	}
+	on_socket_error("Java Socket Bridge cannot send a message until the applet has loaded");
 }
 
 // MUST BE IMPLEMENTED

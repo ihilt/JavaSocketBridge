@@ -1,6 +1,7 @@
-/*global document: false, console: false */
+/*global document: false */
 // Global variables
 var java_socket_bridge_ready_flag = false,
+	websocket_connected = false,
 	is_connected_flag;
 
 // Get the applet object
@@ -9,7 +10,7 @@ function get_java_socket_bridge() {
 	return document.getElementById('JavaSocketBridge');
 }
 
-function is_connected() {
+function is_connected (b) {
 	"use strict";
 	return is_connected_flag;
 }
@@ -17,7 +18,6 @@ function is_connected() {
 // Report an error
 function on_socket_error(message) {
 	"use strict";
-	console.log(message);
 }
 
 // Applet reports it is ready to use
@@ -28,7 +28,7 @@ function java_socket_bridge_ready() {
 
 function is_ready() {
 	"use strict";
-	return java_socket_bridge_ready_flag;
+	return java_socket_bridge_ready_flag || websocket_connected;
 }
 
 // Connect to a given url and port
@@ -63,10 +63,31 @@ function socket_send(message) {
 	"use strict";
 	if (java_socket_bridge_ready_flag) {
 		return get_java_socket_bridge().send(message);
+	} else {
+		on_socket_error("Java Socket Bridge cannot send a message until the applet has loaded");
 	}
-	on_socket_error("Java Socket Bridge cannot send a message until the applet has loaded");
 }
 
-// MUST BE IMPLEMENTED
 // Get something from the socket
-//function on_socket_get(message) {"use strict"; }
+function on_socket_get(message) {"use strict"; }
+
+function websocket_create() {
+	var ws = new WebSocket("ws://10.56.97.27:8080");
+	ws.onopen = function () {
+		console.log("connected");
+		websocket_connected = true;
+		ws.send("Action: QueueStatus");
+		ws.send("");
+	};
+	ws.onmessage = function (evt) {
+		on_socket_get(evt.data);
+	};
+	ws.onerror = function (err) {
+		console.log(err);
+	};
+	ws.onclose = function () {
+		document.getElementById("loading").innerHTML = "Not&nbsp;Ready&hellip;";
+		document.getElementById("loading").setAttribute('style', 'color:red;');
+		console.log("closed");
+	};
+}
